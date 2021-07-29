@@ -26,7 +26,7 @@ class UploadItemView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Text(
-                item.id,
+                'ID: ${item.id}',
                 style: Theme.of(context)
                     .textTheme
                     .caption!
@@ -35,22 +35,21 @@ class UploadItemView extends StatelessWidget {
               Container(
                 height: 5.0,
               ),
-              Text(item.status!.description),
-              // if (item.status == UploadTaskStatus.complete &&
-              //     item.remoteHash != null)
-              //   Builder(builder: (context) {
-              //     return Column(
-              //       mainAxisSize: MainAxisSize.min,
-              //       crossAxisAlignment: CrossAxisAlignment.stretch,
-              //       children: [
-              //         _compareMd5(item.path, item.remoteHash),
-              //         _compareSize(item.path, item.remoteSize),
-              //       ],
-              //     );
-              //   }),
+              Text('Status: ${item.status!.description}'),
               Container(height: 5.0),
               if (item.status == UploadTaskStatus.running)
-                LinearProgressIndicator(value: item.progress!.toDouble() / 100),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                        child: LinearProgressIndicator(
+                            value: item.progress!.toDouble() / 100)),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text('${item.progress!}%')
+                  ],
+                ),
               if (item.status == UploadTaskStatus.complete ||
                   item.status == UploadTaskStatus.failed) ...[
                 Text('HTTP status code: ${item.response!.statusCode}'),
@@ -78,50 +77,4 @@ class UploadItemView extends StatelessWidget {
       ],
     );
   }
-
-  // Text _compareMd5(String localPath, String remoteHash) {
-  //   final File file = File(localPath);
-  //   if (!file.existsSync()) {
-  //     return Text(
-  //       'File ƒ',
-  //       style: TextStyle(color: Colors.grey),
-  //     );
-  //   }
-
-  //   var digest = md5.convert(file.readAsBytesSync());
-  //   if (digest.toString().toLowerCase() == remoteHash) {
-  //     return Text(
-  //       'Hash $digest √',
-  //       style: TextStyle(color: Colors.green),
-  //     );
-  //   } else {
-  //     return Text(
-  //       'Hash $digest vs $remoteHash ƒ',
-  //       style: TextStyle(color: Colors.red),
-  //     );
-  //   }
-  // }
-
-  // Text _compareSize(String localPath, int remoteSize) {
-  //   final File file = File(localPath);
-  //   if (!file.existsSync()) {
-  //     return Text(
-  //       'File ƒ',
-  //       style: TextStyle(color: Colors.grey),
-  //     );
-  //   }
-
-  //   final length = file.lengthSync();
-  //   if (length == remoteSize) {
-  //     return Text(
-  //       'Length $length √',
-  //       style: TextStyle(color: Colors.green),
-  //     );
-  //   } else {
-  //     return Text(
-  //       'Length $length vs $remoteSize ƒ',
-  //       style: TextStyle(color: Colors.red),
-  //     );
-  //   }
-  // }
 }

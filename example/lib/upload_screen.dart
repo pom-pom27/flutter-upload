@@ -29,8 +29,6 @@ class UploadScreen extends StatefulWidget {
 class _UploadScreenState extends State<UploadScreen> {
   ImagePicker imagePicker = ImagePicker();
 
-  ServerBehavior _serverBehavior = ServerBehavior.defaultOk200;
-
   @override
   void initState() {
     super.initState();
@@ -65,26 +63,7 @@ class _UploadScreenState extends State<UploadScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  'Configure test Server Behavior',
-                  style: Theme.of(context).textTheme.subtitle1,
-                ),
-                DropdownButton<ServerBehavior>(
-                  items: ServerBehavior.all.map((e) {
-                    return DropdownMenuItem(
-                      value: e,
-                      child: Text('${e.title}'),
-                    );
-                  }).toList(),
-                  onChanged: (newBehavior) {
-                    if (newBehavior != null) {
-                      setState(() => _serverBehavior = newBehavior);
-                    }
-                  },
-                  value: _serverBehavior,
-                ),
-                Divider(),
-                Text(
-                  'multipart/form-data uploads',
+                  'Upload File',
                   style: Theme.of(context).textTheme.subtitle1,
                 ),
                 Wrap(
@@ -100,32 +79,8 @@ class _UploadScreenState extends State<UploadScreen> {
                       child: Text('upload video'),
                     ),
                     ElevatedButton(
-                      onPressed: () => getMultiple(binary: false),
-                      child: Text('upload multi'),
-                    ),
-                  ],
-                ),
-                Divider(height: 40),
-                Text(
-                  'binary uploads',
-                  style: Theme.of(context).textTheme.subtitle1,
-                ),
-                Text('this will upload selected files as binary'),
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: 10,
-                  children: <Widget>[
-                    ElevatedButton(
-                      onPressed: () => getImage(binary: true),
-                      child: Text('upload image'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () => getVideo(binary: true),
-                      child: Text('upload video'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () => getMultiple(binary: true),
-                      child: Text('upload multi'),
+                      onPressed: () => getCustom(binary: false),
+                      child: Text('upload other file'),
                     ),
                   ],
                 ),
@@ -153,6 +108,17 @@ class _UploadScreenState extends State<UploadScreen> {
         ),
       ),
     );
+  }
+
+  Future getCustom({required bool binary}) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('binary', binary);
+
+    var file = await FilePicker.platform.pickFiles();
+
+    if (file != null) {
+      _handleFileUpload([file.paths.first]);
+    }
   }
 
   Future getImage({required bool binary}) async {
@@ -218,10 +184,6 @@ class _UploadScreenState extends State<UploadScreen> {
         ? widget.uploadURL.replace(path: widget.uploadURL.path + 'Binary')
         : widget.uploadURL;
 
-    url = url.replace(queryParameters: {
-      'simulate': _serverBehavior.name,
-    });
-
     if (binary) {
       return RawUpload(
         url: url.toString(),
@@ -233,7 +195,6 @@ class _UploadScreenState extends State<UploadScreen> {
     } else {
       return MultipartFormDataUpload(
         url: url.toString(),
-        data: {'name': 'john'},
         files: paths.map((e) => FileItem(path: e, field: 'file')).toList(),
         method: UploadMethod.POST,
         tag: tag,

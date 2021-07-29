@@ -11,7 +11,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 const String title = 'FileUpload Sample app';
 final Uri uploadURL = Uri.parse(
-  'https://us-central1-flutteruploadertest.cloudfunctions.net/upload',
+  'http://192.168.31.15:8080/upload',
 );
 
 FlutterUploader _uploader = FlutterUploader();

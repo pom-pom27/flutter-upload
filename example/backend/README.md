@@ -32,7 +32,7 @@ If you want the server to be reachable in your local network, adjust `firebase.j
   },
   "emulators": {
     "functions": {
-      "host": "192.168.1.148",
+      "host": "192.168.31.15",
       "port": 5001
     }
   }
